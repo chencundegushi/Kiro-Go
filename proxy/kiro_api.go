@@ -504,10 +504,11 @@ func listKiroProfilesInRegionContext(
 	seen := make(map[string]struct{})
 	invalidCount := 0
 	nextToken := ""
-	// Bound pagination so a misbehaving upstream cannot loop forever. 20 pages
-	// of 50 is far above any realistic Kiro profile count.
+	// Bound pagination so a misbehaving upstream cannot loop forever. The
+	// ListAvailableProfiles API rejects maxResults above 10 with HTTP 400
+	// ("must have value less than or equal to 10"), so each page requests 10.
 	const maxProfilePages = 20
-	const pageSize = 50
+	const pageSize = 10
 	for page := 0; page < maxProfilePages; page++ {
 		requestBody := map[string]interface{}{"maxResults": pageSize}
 		if nextToken != "" {
